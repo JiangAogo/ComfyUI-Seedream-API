@@ -2,7 +2,6 @@
 
 这是一个为 [ComfyUI](https://github.com/comfyanonymous/ComfyUI) 设计的自定义节点，它允许用户直接在 ComfyUI 的工作流中调用**火山引擎（Volcano Engine）**的 [豆包·Seedream](https://www.volcengine.com/product/doubao-seedream) 系列大模型，实现强大的图生图功能。
 
-[English](./README_en.md) | 中文
 
 ![node_preview](./workflow/example.png) <!-- 建议在这里放一张节点在ComfyUI中的截图 -->
 
