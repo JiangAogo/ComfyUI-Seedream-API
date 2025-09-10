@@ -4,7 +4,7 @@
 
 [English](./README_en.md) | 中文
 
-![node_preview](https://user-images.githubusercontent.com/…..png) <!-- 建议在这里放一张节点在ComfyUI中的截图 -->
+![node_preview](./workflow/example.png) <!-- 建议在这里放一张节点在ComfyUI中的截图 -->
 
 ## ✨ 功能特性
 
