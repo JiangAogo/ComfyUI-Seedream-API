@@ -9,7 +9,7 @@ import os
 import io
 
 # --------------------------------------------------------------------------------
-# 辅助函数区域
+# 辅助函数区域 
 # --------------------------------------------------------------------------------
 
 def encode_image_to_base64(image_tensor):
@@ -60,7 +60,7 @@ def download_image_to_tensor(url):
         return None
 
 # --------------------------------------------------------------------------------
-# ComfyUI 节点核心类
+# ComfyUI 节点核心类 
 # --------------------------------------------------------------------------------
 
 class VolcanoEngineAPINode:
@@ -69,6 +69,11 @@ class VolcanoEngineAPINode:
         return {
             "required": {
                 "image": ("IMAGE",),
+
+                "api_url": ("STRING", {
+                    "multiline": False,
+                    "default": "https://ark.cn-beijing.volces.com/api/v3/images/generations"
+                }),
                 "api_key": ("STRING", {
                     "multiline": False,
                     "default": os.getenv("ARK_API_KEY", "在此输入你的火山引擎API Key")
@@ -95,8 +100,13 @@ class VolcanoEngineAPINode:
     FUNCTION = "generate_image"
     CATEGORY = "Volcano Engine API"
 
-    def generate_image(self, image, api_key, prompt, model, strength, size, watermark, sequential_image_generation, max_images):
-        api_url = "https://ark.cn-beijing.volces.com/api/v3/images/generations"
+
+    def generate_image(self, image, api_url, api_key, prompt, model, strength, size, watermark, sequential_image_generation, max_images):
+
+
+        if not api_url:
+            print("ERROR: API URL is empty.")
+            return (image,) 
 
         if not api_key or "在此输入" in api_key:
             print("ERROR: Volcano Engine API Key is missing.")
@@ -140,10 +150,11 @@ class VolcanoEngineAPINode:
         result_images = []
         payload_for_log = {k: v for k, v in payload.items() if k != 'image'}
         payload_for_log['image_count'] = len(payload.get('image', []))
-        print(f"Sending single request to Volcano Engine API with payload: {json.dumps(payload_for_log, indent=2)}")
+        print(f"Sending single request to {api_url} with payload: {json.dumps(payload_for_log, indent=2)}")
         
         try:
             start_time = time.time()
+
             response = requests.post(api_url, headers=headers, data=json.dumps(payload), timeout=180)
             end_time = time.time()
             
@@ -161,7 +172,6 @@ class VolcanoEngineAPINode:
                     elif item.get("url"):
                         processed_image = download_image_to_tensor(item["url"])
                     
-
                     if processed_image is not None:
                         result_images.append(processed_image)
                     else:
@@ -188,6 +198,10 @@ class VolcanoEngineAPINode:
             
         final_batch = torch.cat(result_images, dim=0)
         return (final_batch,)
+
+# --------------------------------------------------------------------------------
+# 节点注册 
+# --------------------------------------------------------------------------------
 
 NODE_CLASS_MAPPINGS = {
     "VolcanoEngineAPINode": VolcanoEngineAPINode
