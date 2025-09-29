@@ -9,7 +9,7 @@ import os
 import io
 
 # --------------------------------------------------------------------------------
-# 辅助函数区域 
+# 辅助函数区域 (无变化)
 # --------------------------------------------------------------------------------
 
 def encode_image_to_base64(image_tensor):
@@ -60,7 +60,7 @@ def download_image_to_tensor(url):
         return None
 
 # --------------------------------------------------------------------------------
-# ComfyUI 节点核心类 
+# ComfyUI 节点核心类
 # --------------------------------------------------------------------------------
 
 class VolcanoEngineAPINode:
@@ -69,7 +69,6 @@ class VolcanoEngineAPINode:
         return {
             "required": {
                 "image": ("IMAGE",),
-
                 "api_url": ("STRING", {
                     "multiline": False,
                     "default": "https://ark.cn-beijing.volces.com/api/v3/images/generations"
@@ -82,8 +81,8 @@ class VolcanoEngineAPINode:
                     "multiline": True,
                     "default": "在这里输入prompt"
                 }),
-                # --- 新增 SEED 参数 ---
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                # --- 根据官方文档进行最终修正 ---
+                "seed": ("INT", {"default": -1, "min": -1, "max": 2147483647}),
                 "model": (["doubao-seedream-4-0-250828"],),
                 "strength": ("FLOAT", {
                     "default": 0.8,
@@ -102,7 +101,6 @@ class VolcanoEngineAPINode:
     FUNCTION = "generate_image"
     CATEGORY = "Volcano Engine API"
 
-    # --- 修改 generate_image 函数，增加 seed 参数 ---
     def generate_image(self, image, api_url, api_key, prompt, seed, model, strength, size, watermark, sequential_image_generation, max_images):
 
         if not api_url:
@@ -135,7 +133,6 @@ class VolcanoEngineAPINode:
             "prompt": prompt,
             "image": base64_images,
             "strength": strength,
-            # --- 在API请求体中加入 SEED ---
             "seed": seed,
             "response_format": "b64_json",
             "watermark": watermark
@@ -157,7 +154,6 @@ class VolcanoEngineAPINode:
         
         try:
             start_time = time.time()
-
             response = requests.post(api_url, headers=headers, data=json.dumps(payload), timeout=180)
             end_time = time.time()
             
@@ -203,7 +199,7 @@ class VolcanoEngineAPINode:
         return (final_batch,)
 
 # --------------------------------------------------------------------------------
-# 节点注册 
+# 节点注册
 # --------------------------------------------------------------------------------
 
 NODE_CLASS_MAPPINGS = {
