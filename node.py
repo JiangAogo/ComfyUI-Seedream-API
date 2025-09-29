@@ -82,6 +82,8 @@ class VolcanoEngineAPINode:
                     "multiline": True,
                     "default": "在这里输入prompt"
                 }),
+                # --- 新增 SEED 参数 ---
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
                 "model": (["doubao-seedream-4-0-250828"],),
                 "strength": ("FLOAT", {
                     "default": 0.8,
@@ -100,9 +102,8 @@ class VolcanoEngineAPINode:
     FUNCTION = "generate_image"
     CATEGORY = "Volcano Engine API"
 
-
-    def generate_image(self, image, api_url, api_key, prompt, model, strength, size, watermark, sequential_image_generation, max_images):
-
+    # --- 修改 generate_image 函数，增加 seed 参数 ---
+    def generate_image(self, image, api_url, api_key, prompt, seed, model, strength, size, watermark, sequential_image_generation, max_images):
 
         if not api_url:
             print("ERROR: API URL is empty.")
@@ -134,6 +135,8 @@ class VolcanoEngineAPINode:
             "prompt": prompt,
             "image": base64_images,
             "strength": strength,
+            # --- 在API请求体中加入 SEED ---
+            "seed": seed,
             "response_format": "b64_json",
             "watermark": watermark
         }
