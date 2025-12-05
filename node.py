@@ -68,10 +68,9 @@ class VolcanoEngineAPINode:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "image": ("IMAGE",),
                 "api_url": ("STRING", {
                     "multiline": False,
-                    "default": "https://ark.cn-beijing.volces.com/api/v3/images/generations"  
+                    "default": "https://ark.cn-beijing.volces.com/api/v3/images/generations"   
                 }),
                 "api_key": ("STRING", {
                     "multiline": False,
@@ -82,13 +81,7 @@ class VolcanoEngineAPINode:
                     "default": "在这里输入prompt"
                 }),
                 "seed": ("INT", {"default": -1, "min": -1, "max": 2147483647}),
-                "model": (["doubao-seedream-4-5-251128", "doubao-seedream-4-0-250828"],),
-                "strength": ("FLOAT", {
-                    "default": 0.8,
-                    "min": 0.0,
-                    "max": 1.0,
-                    "step": 0.05
-                }),
+                                "model": (["doubao-seedream-4-5-251128", "doubao-seedream-4-0-250828"],),
                 "size": ([
                     "auto", 
                     "1K", 
@@ -107,6 +100,10 @@ class VolcanoEngineAPINode:
                 "watermark": ("BOOLEAN", {"default": False}),
                 "sequential_image_generation": (["disabled", "auto"],),
                 "max_images": ("INT", {"default": 1, "min": 1, "max": 15, "step": 1}),
+                "optimize_prompt_mode": (["disabled", "standard", "fast"],),
+            },
+            "optional": {
+                "image": ("IMAGE",),
             },
         }
 
@@ -114,7 +111,7 @@ class VolcanoEngineAPINode:
     FUNCTION = "generate_image"
     CATEGORY = "Volcano Engine API"
 
-    def generate_image(self, image, api_url, api_key, prompt, seed, model, strength, size, watermark, sequential_image_generation, max_images):
+    def generate_image(self, api_url, api_key, prompt, seed, model, size, watermark, sequential_image_generation, max_images, optimize_prompt_mode, image=None):
 
         if not api_url:
             print("ERROR: API URL is empty.")
@@ -129,27 +126,30 @@ class VolcanoEngineAPINode:
             "Authorization": f"Bearer {api_key}"
         }
         
-        base64_images = []
-        print(f"Processing a batch of {len(image)} images for a single API call...")
-        for img_tensor in image:
-            single_image_batch = img_tensor.unsqueeze(0)
-            base64_data = encode_image_to_base64(single_image_batch)
-            if base64_data:
-                base64_images.append(base64_data)
-
-        if not base64_images:
-            print("ERROR: Failed to encode any images from the input batch.")
-            return (image,)
-
         payload = {
             "model": model,
             "prompt": prompt,
-            "image": base64_images,
-            "strength": strength,
             "seed": seed,
             "response_format": "b64_json",
             "watermark": watermark
         }
+
+        if image is not None:
+            base64_images = []
+            print(f"Processing a batch of {len(image)} images for image-to-image generation...")
+            for img_tensor in image:
+                single_image_batch = img_tensor.unsqueeze(0)
+                base64_data = encode_image_to_base64(single_image_batch)
+                if base64_data:
+                    base64_images.append(base64_data)
+
+            if not base64_images:
+                print("ERROR: Failed to encode any images from the input batch.")
+                return (torch.zeros(1, 512, 512, 3),)  # 返回一个空白图片
+            
+                payload["image"] = base64_images
+        else:
+            print("No input image provided. Running text-to-image generation...")
 
         if size != "auto":
             payload['size'] = size
@@ -158,6 +158,12 @@ class VolcanoEngineAPINode:
             payload['sequential_image_generation'] = "auto"
             payload['sequential_image_generation_options'] = {
                 "max_images": max_images
+            }
+
+        # 添加提示词优化参数（仅 doubao-seedream-4-5 和 doubao-seedream-4-0 支持该参数）
+        if optimize_prompt_mode != "disabled":
+            payload['optimize_prompt_options'] = {
+                "mode": optimize_prompt_mode
             }
 
         result_images = []
@@ -202,11 +208,11 @@ class VolcanoEngineAPINode:
                     print(f"--------------------------------")
                 except json.JSONDecodeError: 
                     print(f"Error response content: {e.response.text}")
-            return (image,)
+            return (torch.zeros(1, 512, 512, 3),)
 
         if not result_images:
-            print("ERROR: No images were generated. Returning the original input images.")
-            return (image,)
+            print("ERROR: No images were generated.")
+            return (torch.zeros(1, 512, 512, 3),)  # 返回一个空白图片
             
         final_batch = torch.cat(result_images, dim=0)
         return (final_batch,)
