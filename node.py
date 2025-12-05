@@ -71,7 +71,7 @@ class VolcanoEngineAPINode:
                 "image": ("IMAGE",),
                 "api_url": ("STRING", {
                     "multiline": False,
-                    "default": "https://ark.cn-beijing.volces.com/api/v3/images/generations"
+                    "default": "https://ark.cn-beijing.volces.com/api/v3/images/generations"  
                 }),
                 "api_key": ("STRING", {
                     "multiline": False,
@@ -81,16 +81,29 @@ class VolcanoEngineAPINode:
                     "multiline": True,
                     "default": "在这里输入prompt"
                 }),
-                # --- 根据官方文档进行最终修正 ---
                 "seed": ("INT", {"default": -1, "min": -1, "max": 2147483647}),
-                "model": (["doubao-seedream-4-0-250828"],),
+                "model": (["doubao-seedream-4-5-251128", "doubao-seedream-4-0-250828"],),
                 "strength": ("FLOAT", {
                     "default": 0.8,
                     "min": 0.0,
                     "max": 1.0,
                     "step": 0.05
                 }),
-                "size": (["auto", "1K", "2K", "4K"],),
+                "size": ([
+                    "auto", 
+                    "1K", 
+                    "2K", 
+                    "4K", 
+                    "1440x2560",
+                    "2048x2048",  # 1:1
+                    "2304x1728",  # 4:3
+                    "1728x2304",  # 3:4
+                    "2560x1440",  # 16:9
+                    "1440x2560",  # 9:16
+                    "2496x1664",  # 3:2
+                    "1664x2496",  # 2:3
+                    "3024x1296"   # 21:9
+                ],),
                 "watermark": ("BOOLEAN", {"default": False}),
                 "sequential_image_generation": (["disabled", "auto"],),
                 "max_images": ("INT", {"default": 1, "min": 1, "max": 15, "step": 1}),

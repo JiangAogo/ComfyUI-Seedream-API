@@ -1,5 +1,13 @@
 # ComfyUI Volcano Engine Seedream Node
 
+## 📝 更新日志
+
+### 2025/12/05更新
+- 新增 `doubao-seedream-4-5-251128` 模型支持
+- 补充 `size` 参数选项，新增多种常用宽高比尺寸（1:1, 4:3, 3:4, 16:9, 9:16, 3:2, 2:3, 21:9）
+
+---
+
 这是一个为 [ComfyUI](https://github.com/comfyanonymous/ComfyUI) 设计的自定义节点，它允许用户直接在 ComfyUI 的工作流中调用**火山引擎（Volcano Engine）**的 [豆包·Seedream](https://www.volcengine.com/product/doubao-seedream) 系列大模型，实现强大的图生图功能。
 
 ![node_preview](./workflow/example.png) <!-- 建议在这里放一张节点在ComfyUI中的截图 -->
