@@ -8,7 +8,7 @@
 - 补充 `size` 参数选项，新增多种常用宽高比尺寸（1:1, 4:3, 3:4, 16:9, 9:16, 3:2, 2:3, 21:9）
 - 新增 `optimize_prompt_mode` 提示词优化功能，支持 `standard` 和 `fast` 两种模式，该参数仅支持`doubao-seedream-4-5`
 - 新增 `sequential_image_generation` 组图功能
-- ![sequential_image_example]（`workflow/seqential_image.png`），
+![sequential_image_example]（`workflow/seqential_image.png`），
 ---
 
 这是一个为 [ComfyUI](https://github.com/comfyanonymous/ComfyUI) 设计的自定义节点，它允许用户直接在 ComfyUI 的工作流中调用**火山引擎（Volcano Engine）**的 [豆包·Seedream](https://www.volcengine.com/product/doubao-seedream) 系列大模型，实现强大的图生图功能。
