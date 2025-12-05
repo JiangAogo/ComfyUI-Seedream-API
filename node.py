@@ -70,7 +70,7 @@ class VolcanoEngineAPINode:
             "required": {
                 "api_url": ("STRING", {
                     "multiline": False,
-                    "default": "https://ark.cn-beijing.volces.com/api/v3/images/generations"   
+                    "default": "https://ark.cn-beijing.volces.com/api/v3/images/generations" 
                 }),
                 "api_key": ("STRING", {
                     "multiline": False,
@@ -86,7 +86,7 @@ class VolcanoEngineAPINode:
                     "auto", 
                     "1K", 
                     "2K", 
-                    "4K", 
+                    "4从K", 
                     "1440x2560",
                     "2048x2048",  # 1:1
                     "2304x1728",  # 4:3
@@ -147,7 +147,7 @@ class VolcanoEngineAPINode:
                 print("ERROR: Failed to encode any images from the input batch.")
                 return (torch.zeros(1, 512, 512, 3),)  # 返回一个空白图片
             
-                payload["image"] = base64_images
+            payload["image"] = base64_images
         else:
             print("No input image provided. Running text-to-image generation...")
 
@@ -212,7 +212,7 @@ class VolcanoEngineAPINode:
 
         if not result_images:
             print("ERROR: No images were generated.")
-            return (torch.zeros(1, 512, 512, 3),)  # 返回一个空白图片
+            return (torch.zeros(1, 512, 512, 3),) 
             
         final_batch = torch.cat(result_images, dim=0)
         return (final_batch,)
