@@ -8,12 +8,14 @@
 - 补充 `size` 参数选项，新增多种常用宽高比尺寸（1:1, 4:3, 3:4, 16:9, 9:16, 3:2, 2:3, 21:9）
 - 新增 `optimize_prompt_mode` 提示词优化功能，支持 `standard` 和 `fast` 两种模式，该参数仅支持`doubao-seedream-4-5`
 - 新增 `sequential_image_generation` 组图功能
-![sequential_image_example]（`workflow/seqential_image.png`），
+
+![sequential_image_example](./workflow/seqential_image.png)
+*组图功能示例*
 ---
 
 这是一个为 [ComfyUI](https://github.com/comfyanonymous/ComfyUI) 设计的自定义节点，它允许用户直接在 ComfyUI 的工作流中调用**火山引擎（Volcano Engine）**的 [豆包·Seedream](https://www.volcengine.com/product/doubao-seedream) 系列大模型，实现强大的图生图功能。
 
-![node_preview](./workflow/example.png)
+
 *   **无缝集成**：将火山引擎的先进图像生成能力带入 ComfyUI 的节点式工作流。
 *   **高度灵活**：API 地址（`api_url`）可作为输入项，方便用户切换不同的代理或API端点。
 *   **参数可调**：所有核心 API 参数（如 `prompt`, `strength`, `seed`, `size` 等）均可在节点UI上进行可视化调整。
@@ -31,12 +33,7 @@
 
 ### 基本用法 (单图生图)
 
-1.  添加一个 `Load Image` 节点，加载你的原始图片。
-2.  将 `Load Image` 节点的 `IMAGE` 输出连接到本节点的 `image` 输入。
-3.  在本节点中，确保 `api_url` 正确无误，然后填入你的 `api_key` 和 `prompt`。
-4.  调整 `strength`、`seed` 等参数。
-5.  将本节点的 `IMAGE` 输出连接到 `Preview Image` 或 `Save Image` 节点。
-6.  点击 "Queue Prompt" 运行。
+![node_preview](./workflow/example.png)
 
 ### 高级用法 (生成组图)
 
