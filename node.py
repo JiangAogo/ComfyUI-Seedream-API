@@ -9,7 +9,7 @@ import os
 import io
 
 # --------------------------------------------------------------------------------
-# 辅助函数区域
+# 辅助函数区域 (无变化)
 # --------------------------------------------------------------------------------
 
 def encode_image_to_base64(image_tensor):
@@ -70,7 +70,7 @@ class VolcanoEngineAPINode:
             "required": {
                 "api_url": ("STRING", {
                     "multiline": False,
-                    "default": "https://ark.cn-beijing.volces.com/api/v3/images/generations" 
+                    "default": "https://ark.cn-beijing.volces.com/api/v3/images/generations"    
                 }),
                 "api_key": ("STRING", {
                     "multiline": False,
@@ -81,12 +81,12 @@ class VolcanoEngineAPINode:
                     "default": "在这里输入prompt"
                 }),
                 "seed": ("INT", {"default": -1, "min": -1, "max": 2147483647}),
-                                "model": (["doubao-seedream-4-5-251128", "doubao-seedream-4-0-250828"],),
+                                "model": (["doubao-seedream-4-5-251128", "doubao-seedream-4-0-250828", "doubao-seedream-5-0-260128"],),
                 "size": ([
-                    "auto", 
-                    "1K", 
-                    "2K", 
-                    "4K", 
+                    "auto",
+                    "1K",
+                    "2K",
+                    "4K",
                     "1440x2560",
                     "2048x2048",  # 1:1
                     "2304x1728",  # 4:3
@@ -95,8 +95,12 @@ class VolcanoEngineAPINode:
                     "1440x2560",  # 9:16
                     "2496x1664",  # 3:2
                     "1664x2496",  # 2:3
-                    "3024x1296"   # 21:9
+                    "3024x1296",  # 21:9
+                    "1344x3136"   # 9:21
                 ],),
+                "use_custom_size": ("BOOLEAN", {"default": False}),
+                "custom_width": ("INT", {"default": 1024, "min": 64, "max": 4096, "step": 64}),
+                "custom_height": ("INT", {"default": 1024, "min": 64, "max": 4096, "step": 64}),
                 "watermark": ("BOOLEAN", {"default": False}),
                 "sequential_image_generation": (["disabled", "auto"],),
                 "max_images": ("INT", {"default": 1, "min": 1, "max": 15, "step": 1}),
@@ -111,15 +115,15 @@ class VolcanoEngineAPINode:
     FUNCTION = "generate_image"
     CATEGORY = "Volcano Engine API"
 
-    def generate_image(self, api_url, api_key, prompt, seed, model, size, watermark, sequential_image_generation, max_images, optimize_prompt_mode, image=None):
+    def generate_image(self, api_url, api_key, prompt, seed, model, size, use_custom_size, custom_width, custom_height, watermark, sequential_image_generation, max_images, optimize_prompt_mode, image=None):
 
         if not api_url:
             print("ERROR: API URL is empty.")
-            return (image,) 
+            return (torch.zeros(1, 512, 512, 3),)
 
         if not api_key or "在此输入" in api_key:
             print("ERROR: Volcano Engine API Key is missing.")
-            return (image,)
+            return (torch.zeros(1, 512, 512, 3),)
 
         headers = {
             "Content-Type": "application/json",
@@ -151,7 +155,9 @@ class VolcanoEngineAPINode:
         else:
             print("No input image provided. Running text-to-image generation...")
 
-        if size != "auto":
+        if use_custom_size:
+            payload['size'] = f"{custom_width}x{custom_height}"
+        elif size != "auto":
             payload['size'] = size
 
         if sequential_image_generation == "auto":
@@ -212,7 +218,7 @@ class VolcanoEngineAPINode:
 
         if not result_images:
             print("ERROR: No images were generated.")
-            return (torch.zeros(1, 512, 512, 3),) 
+            return (torch.zeros(1, 512, 512, 3),)  # 返回一个空白图片
             
         final_batch = torch.cat(result_images, dim=0)
         return (final_batch,)
